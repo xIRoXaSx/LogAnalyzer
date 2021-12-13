@@ -2,6 +2,7 @@ package configuration
 
 import (
 	"LogAnalyzer/logger"
+	"encoding/json"
 	"errors"
 	"io/ioutil"
 	"os"
@@ -12,13 +13,29 @@ import (
 	"strings"
 )
 
-type empty struct{}
+// jsonConfig is the root object inside the json config
+type jsonConfig struct {
+	LogAnalyzer logAnalyzer
+}
 
+// logAnalyzer is the main object
+type logAnalyzer struct {
+	EnableDebug bool
+	Filters     []filter
+}
+
+// filter is the array / slice of all filter objects
+type filter struct {
+	Name  string
+	Regex string
+}
+
+var JsonConfig jsonConfig
 var configFileName = "config.json"
 var configFolderName = packageName[:strings.IndexByte(packageName, '/')]
 var configBasePath, _ = os.UserConfigDir()
 var configPath = filepath.Join(configBasePath, configFolderName)
-var packageName = reflect.TypeOf(empty{}).PkgPath()
+var packageName = reflect.TypeOf(jsonConfig{}).PkgPath()
 var configFullPath = filepath.Join(configBasePath, configFolderName, configFileName)
 
 // CreateConfigIfNotExists creates / copies the default configuration if it does not exist locally
@@ -64,5 +81,44 @@ func copyFile() {
 		logger.Error(err.Error())
 	} else {
 		logger.Info("Created config file \"" + configFullPath + "\"")
+	}
+}
+
+// ReadJson unmarshalls the json config file
+func ReadJson() {
+	jsonFile, err := os.Open(configFullPath)
+	if err != nil {
+		logger.Error(err.Error())
+		return
+	}
+
+	bytes, err := ioutil.ReadAll(jsonFile)
+	if err != nil {
+		logger.Error(err.Error())
+		return
+	}
+
+	defer func(jsonFile *os.File) {
+		err := jsonFile.Close()
+		if err != nil {
+			logger.Error(err.Error())
+			panic("Cannot close file")
+		}
+	}(jsonFile)
+
+	err = json.Unmarshal(bytes, &JsonConfig)
+	if err != nil {
+		logger.Error(err.Error())
+		return
+	}
+
+	if !JsonConfig.LogAnalyzer.EnableDebug {
+		return
+	}
+
+	for i := 0; i < len(JsonConfig.LogAnalyzer.Filters); i++ {
+		logger.Debug("Filter \"" + JsonConfig.LogAnalyzer.Filters[i].Name +
+			"\" loaded with Regex \"" + JsonConfig.LogAnalyzer.Filters[i].Regex + "\"",
+		)
 	}
 }
