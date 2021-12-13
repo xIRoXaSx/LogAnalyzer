@@ -13,29 +13,29 @@ import (
 	"strings"
 )
 
-// jsonConfig is the root object inside the json config
-type jsonConfig struct {
-	LogAnalyzer logAnalyzer
+// JsonConf is the root object inside the json config
+type JsonConf struct {
+	LogAnalyzer LogAnalyzer
 }
 
-// logAnalyzer is the main object
-type logAnalyzer struct {
+// LogAnalyzer is the main object
+type LogAnalyzer struct {
 	EnableDebug bool
-	Filters     []filter
+	Filters     []Filter
 }
 
-// filter is the array / slice of all filter objects
-type filter struct {
+// Filter is the array / slice of all filter objects
+type Filter struct {
 	Name  string
 	Regex string
 }
 
-var JsonConfig jsonConfig
+var JsonConfig JsonConf
 var configFileName = "config.json"
 var configFolderName = packageName[:strings.IndexByte(packageName, '/')]
 var configBasePath, _ = os.UserConfigDir()
 var configPath = filepath.Join(configBasePath, configFolderName)
-var packageName = reflect.TypeOf(jsonConfig{}).PkgPath()
+var packageName = reflect.TypeOf(JsonConf{}).PkgPath()
 var configFullPath = filepath.Join(configBasePath, configFolderName, configFileName)
 
 // CreateConfigIfNotExists creates / copies the default configuration if it does not exist locally
