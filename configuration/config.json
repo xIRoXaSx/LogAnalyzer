@@ -1,0 +1,18 @@
+{
+  "LogAnalyzer": {
+    "Filters": [
+      {
+        "Name": "Info",
+        "Regex": "[.*INFO]"
+      },
+      {
+        "Name": "Error",
+        "Regex": "[.*ERROR]"
+      },
+      {
+        "Name": "JavaStackTrace",
+        "Regex": "(?m)^.*?Exception.*(?:\\R+^\\s*at .*)+"
+      }
+    ]
+  }
+}
