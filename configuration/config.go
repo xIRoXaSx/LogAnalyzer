@@ -1,7 +1,9 @@
 package configuration
 
 import (
+	"LogAnalyzer/helper"
 	"LogAnalyzer/logger"
+	"LogAnalyzer/structs"
 	"encoding/json"
 	"errors"
 	"io/ioutil"
@@ -13,29 +15,12 @@ import (
 	"strings"
 )
 
-// JsonConf is the root object inside the json config
-type JsonConf struct {
-	LogAnalyzer LogAnalyzer
-}
-
-// LogAnalyzer is the main object
-type LogAnalyzer struct {
-	EnableDebug bool
-	Filters     []Filter
-}
-
-// Filter is the array / slice of all filter objects
-type Filter struct {
-	Name  string
-	Regex string
-}
-
-var JsonConfig JsonConf
+var JsonConfig structs.JsonConf
 var configFileName = "config.json"
 var configFolderName = packageName[:strings.IndexByte(packageName, '/')]
 var configBasePath, _ = os.UserConfigDir()
 var configPath = filepath.Join(configBasePath, configFolderName)
-var packageName = reflect.TypeOf(JsonConf{}).PkgPath()
+var packageName = reflect.TypeOf(structs.JsonConf{}).PkgPath()
 var configFullPath = filepath.Join(configBasePath, configFolderName, configFileName)
 
 // CreateConfigIfNotExists creates / copies the default configuration if it does not exist locally
@@ -66,18 +51,14 @@ func copyFile() {
 	}
 
 	// Open the config configFile
-	readBytes, err := ioutil.ReadFile(filepath.Join(path.Dir(filename), configFileName))
-	if err != nil {
-		logger.Error(err.Error())
-		return
-	}
+	content := helper.GetFileContent(filepath.Join(path.Dir(filename), configFileName))
 
-	if len(readBytes) < 1 {
+	if len(content) < 1 {
 		return
 	}
 
 	// Open the config configFile
-	if err := ioutil.WriteFile(configFullPath, readBytes, 0700); err != nil {
+	if err := ioutil.WriteFile(configFullPath, content, 0700); err != nil {
 		logger.Error(err.Error())
 	} else {
 		logger.Info("Created config file \"" + configFullPath + "\"")

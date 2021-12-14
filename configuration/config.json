@@ -4,15 +4,19 @@
     "Filters": [
       {
         "Name": "Info",
-        "Regex": "[.*INFO]"
+        "Regex": "(?m)^.*\\[.*INFO\\].*"
       },
       {
         "Name": "Error",
-        "Regex": "[.*ERROR]"
+        "Regex": "(?m)^.*\\[.*ERROR\\].*"
       },
       {
         "Name": "JavaStackTrace",
-        "Regex": "(?m)^.*?Exception.*(?:\\R+^\\s*at .*)+"
+        "Regex": "(?m)^.*?Exception.*(?:[\\r|\\n]+^\\s*at .*)+"
+      },
+      {
+        "Name": "StackTrace",
+        "Regex": "(?m)((.*(\\n|\\r|\\r\\n)){1})^.*?Exception.*(?:[\\n|\\r|\\r\\n]+^\\s*at .*)+"
       }
     ]
   }
