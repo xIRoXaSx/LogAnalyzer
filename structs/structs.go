@@ -16,3 +16,10 @@ type Filter struct {
 	Name  string
 	Regex string
 }
+
+// Command is a struct for each available command with its Usage and Description
+type Command struct {
+	Name        string
+	Usage       string
+	Description string
+}

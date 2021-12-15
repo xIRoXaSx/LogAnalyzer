@@ -37,8 +37,8 @@ func CheckArgs() {
 	return
 }
 
-// getFilterAndFilePathFromArgs checks each argument for filter name and file path.
-// This enables users to swap filter names and file paths.
+/* getFilterAndFilePathFromArgs checks each argument for filter name and file path.
+This enables users to swap filter names and file paths.*/
 func getFilterAndFilePathFromArgs(args []string) (structs.Filter, string) {
 	filter := structs.Filter{}
 	filePath := ""
@@ -66,9 +66,9 @@ func getFilterAndFilePathFromArgs(args []string) (structs.Filter, string) {
 
 // printHelp prints all available commands, their usage and description
 func printHelp() {
+	fmt.Println("")
 	fmt.Println("Usage:")
 	fmt.Println("  LogAnalyzer [command]")
 	fmt.Println("")
-	fmt.Println("Available commands\tUsage\t\t\t\t\t\tDescription")
-	fmt.Println("  inspect\t\tLogAnalyzer i[nspect] <Filter name> <Logfile>\tInspect a logfile with the provided filter")
+	commands.PrintCommands()
 }
