@@ -54,11 +54,6 @@ func getFilterAndFilePathFromArgs(args []string) (structs.Filter, string) {
 			filePath = args[i]
 			continue
 		}
-
-		// Break if filter and filePath have been set
-		if filePath != "" && filter != (structs.Filter{}) {
-			break
-		}
 	}
 
 	return filter, filePath
