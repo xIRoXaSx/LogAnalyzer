@@ -1,17 +1,14 @@
 package configuration
 
 import (
-	"LogAnalyzer/helper"
 	"LogAnalyzer/logger"
 	"LogAnalyzer/structs"
 	"encoding/json"
 	"errors"
 	"io/ioutil"
 	"os"
-	"path"
 	"path/filepath"
 	"reflect"
-	"runtime"
 	"strings"
 )
 
@@ -19,55 +16,59 @@ var JsonConfig structs.JsonConf
 var configFileName = "config.json"
 var configFolderName = packageName[:strings.IndexByte(packageName, '/')]
 var configBasePath, _ = os.UserConfigDir()
-var configPath = filepath.Join(configBasePath, configFolderName)
+var ConfigPath = filepath.Join(configBasePath, configFolderName)
 var packageName = reflect.TypeOf(structs.JsonConf{}).PkgPath()
-var configFullPath = filepath.Join(configBasePath, configFolderName, configFileName)
+var ConfigFullPath = filepath.Join(configBasePath, configFolderName, configFileName)
 
 // CreateConfigIfNotExists creates / copies the default configuration if it does not exist locally
 func CreateConfigIfNotExists() {
-	if _, err := os.Stat(configPath); errors.Is(err, os.ErrNotExist) {
-		err := os.Mkdir(configPath, 0700)
+	if _, err := os.Stat(ConfigPath); errors.Is(err, os.ErrNotExist) {
+		err := os.Mkdir(ConfigPath, 0700)
 		if err != nil {
 			logger.Error(err.Error())
 			return
 		}
 
-		logger.Info("Created config directory \"" + configPath + "\"")
+		logger.Info("Created config directory \"" + ConfigPath + "\"")
 	}
 
-	if _, err := os.Stat(configFullPath); err == nil {
+	if _, err := os.Stat(ConfigFullPath); err == nil {
 		return
 	}
 
-	copyFile()
+	writeConfig()
 	return
 }
 
-// CopyFile copies the content of the default config.json to the local one
-func copyFile() {
-	_, filename, _, gotInfo := runtime.Caller(0)
-	if !gotInfo {
-		panic("No caller information")
+// writeConfig writes the config file to the config path
+func writeConfig() {
+	jsonConfig := structs.JsonConf{
+		LogAnalyzer: structs.LogAnalyzer{
+			EnableDebug: false,
+			Filters: []structs.Filter{
+				{Name: "Info", Regex: "(?m)^.*\\[.*INFO\\].*"},
+				{Name: "Error", Regex: "(?m)^.*\\[.*ERROR\\].*"},
+				{Name: "StackTrace", Regex: "(?m)((.*(\\n|\\r|\\r\\n)){1})^.*?Exception.*(?:[\\n|\\r|\\r\\n]+^\\s*at .*)+"},
+				{Name: "JavaStackTrace", Regex: "(?m)^.*?Exception.*(?:[\\r|\\n]+^\\s*at .*)+"},
+			},
+		},
 	}
 
-	// Open the config configFile
-	content := helper.GetFileContent(filepath.Join(path.Dir(filename), configFileName))
-
-	if len(content) < 1 {
-		return
+	content, err := json.MarshalIndent(jsonConfig, "", "\t")
+	if err != nil {
+		logger.Error(err.Error())
 	}
 
-	// Open the config configFile
-	if err := ioutil.WriteFile(configFullPath, content, 0700); err != nil {
+	if err := ioutil.WriteFile(ConfigFullPath, content, 0700); err != nil {
 		logger.Error(err.Error())
 	} else {
-		logger.Info("Created config file \"" + configFullPath + "\"")
+		logger.Info("Created config file \"" + ConfigFullPath + "\"")
 	}
 }
 
 // ReadJson unmarshalls the json config file
 func ReadJson() {
-	jsonFile, err := os.Open(configFullPath)
+	jsonFile, err := os.Open(ConfigFullPath)
 	if err != nil {
 		logger.Error(err.Error())
 		return
