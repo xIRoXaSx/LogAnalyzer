@@ -49,7 +49,7 @@ func writeConfig() {
 			Filters: []structs.Filter{
 				{Name: "Info", Regex: "(?m)^.*\\[.*INFO\\].*", Replacement: "", RemoveEmptyLines: true},
 				{Name: "Error", Regex: "(?m)^.*\\[.*ERROR\\].*", Replacement: "", RemoveEmptyLines: true},
-				{Name: "JsonMin", Regex: "\\s(?=[\\s\":{}])", Replacement: "", RemoveEmptyLines: true},
+				{Name: "JsonMin", Regex: "(\\s+[^{}\"'\\[\\]\\\\\\w])|(\\B\\s)", Replacement: "", RemoveEmptyLines: true},
 				{Name: "JavaStackTrace", Regex: "(?m)^.*?Exception.*(?:[\\r|\\n]+^\\s*at .*)+"},
 				{Name: "StackTrace", Regex: "(?m)((.*(\\n|\\r|\\r\\n)){1})^.*?Exception.*(?:[\\n|\\r|\\r\\n]+^\\s*at .*)+",
 					Replacement: "Nothing ever happened here :)", RemoveEmptyLines: true},
