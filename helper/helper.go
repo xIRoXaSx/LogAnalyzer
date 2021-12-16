@@ -4,10 +4,14 @@ import (
 	"LogAnalyzer/logger"
 	"LogAnalyzer/structs"
 	"os"
+	"regexp"
 	"strings"
+	"time"
 )
 
-func Contains(slice []structs.Filter, desired string) structs.Filter {
+// ContainsFilterName checks if the 'desired' string exists in the structs.Filter slice names.
+// Returns the corresponding filter or an empty struct of structs.Filter
+func ContainsFilterName(slice []structs.Filter, desired string) structs.Filter {
 	returnValue := structs.Filter{}
 
 	for i := 0; i < len(slice); i++ {
@@ -76,4 +80,15 @@ func GetSpaceSeparator(length int, maxLength int, separator string) string {
 	}
 
 	return strings.Repeat(separator, calcLen+5)
+}
+
+// GetAllRegexpMatches gets all matches of the text with the given regex
+func GetAllRegexpMatches(text string, regexString string) []string {
+	regex := regexp.MustCompile(regexString)
+	return regex.FindAllString(text, -1)
+}
+
+// CalculateExecutionDuration gets the time passed since 'startTime'
+func CalculateExecutionDuration(startTime time.Time) string {
+	return time.Since(startTime).Round(time.Millisecond).String()
 }

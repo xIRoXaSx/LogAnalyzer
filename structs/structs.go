@@ -13,8 +13,10 @@ type LogAnalyzer struct {
 
 // Filter is the array / slice of all filter objects
 type Filter struct {
-	Name  string
-	Regex string
+	Name             string
+	Regex            string
+	Replacement      string
+	RemoveEmptyLines bool
 }
 
 // Command is a struct for each available command with its Usage and Description

@@ -15,6 +15,8 @@ func putCommand(name string, usage string, description string) {
 func LoadCommands() {
 	putCommand("listfilter", "LogAnalyzer l[istfilter]", "List all configured filters")
 	putCommand("inspect", "LogAnalyzer i[nspect] <Filter name> <Logfile>", "Inspect a logfile with the provided filter")
+	putCommand("replace", "LogAnalyzer r[eplace] <Filter name> <Logfile> [Replacement]",
+		"Replace all matched occurrences from the provided filter with [Replacement] or the corresponding value from the config")
 }
 
 func PrintCommands() {

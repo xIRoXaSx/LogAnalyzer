@@ -5,7 +5,6 @@ import (
 	"LogAnalyzer/logger"
 	"LogAnalyzer/structs"
 	"fmt"
-	"regexp"
 	"time"
 )
 
@@ -24,18 +23,8 @@ func Inspect(filePath string, filter structs.Filter) {
 	}
 
 	text := string(returnValue)
-	matched, err := regexp.MatchString(filter.Regex, text)
-	if err != nil {
-		logger.Error(err.Error())
-		return
-	}
+	matchedStrings := helper.GetAllRegexpMatches(text, filter.Regex)
 
-	if !matched {
-		logger.Info("No match found!")
-		return
-	}
-
-	matchedStrings := getRegexMatches(text, filter.Regex)
 	if len(matchedStrings) < 1 {
 		return
 	}
@@ -45,11 +34,5 @@ func Inspect(filePath string, filter structs.Filter) {
 	}
 
 	fmt.Println()
-	logger.Info("Finished after " + (time.Since(start).Round(time.Millisecond).String()))
-}
-
-// getRegexMatches gets the regex matches from the given parameters
-func getRegexMatches(text string, regexString string) []string {
-	regex := regexp.MustCompile(regexString)
-	return regex.FindAllString(text, -1)
+	logger.Info("Finished after " + helper.CalculateExecutionDuration(start))
 }

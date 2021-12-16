@@ -35,6 +35,11 @@ func TestInspectInfoSuccess(t *testing.T) {
 	main()
 }
 
+func TestReplaceInfoSuccess(t *testing.T) {
+	os.Args = []string{"PathOfBin", "repl", "Info", exampleLogPath, "REPLACED"}
+	main()
+}
+
 func TestTooLessArgs(t *testing.T) {
 	os.Args = []string{"PathOfBin"}
 	main()

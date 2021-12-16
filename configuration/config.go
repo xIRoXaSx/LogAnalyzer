@@ -5,6 +5,7 @@ import (
 	"LogAnalyzer/structs"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -13,11 +14,11 @@ import (
 )
 
 var JsonConfig structs.JsonConf
+var packageName = reflect.TypeOf(structs.JsonConf{}).PkgPath()
 var configFileName = "config.json"
 var configFolderName = packageName[:strings.IndexByte(packageName, '/')]
 var configBasePath, _ = os.UserConfigDir()
 var ConfigPath = filepath.Join(configBasePath, configFolderName)
-var packageName = reflect.TypeOf(structs.JsonConf{}).PkgPath()
 var ConfigFullPath = filepath.Join(configBasePath, configFolderName, configFileName)
 
 // CreateConfigIfNotExists creates / copies the default configuration if it does not exist locally
@@ -46,11 +47,12 @@ func writeConfig() {
 		LogAnalyzer: structs.LogAnalyzer{
 			EnableDebug: false,
 			Filters: []structs.Filter{
-				{Name: "Info", Regex: "(?m)^.*\\[.*INFO\\].*"},
-				{Name: "Error", Regex: "(?m)^.*\\[.*ERROR\\].*"},
-				{Name: "StackTrace", Regex: "(?m)((.*(\\n|\\r|\\r\\n)){1})^.*?Exception.*(?:[\\n|\\r|\\r\\n]+^\\s*at .*)+"},
+				{Name: "Info", Regex: "(?m)^.*\\[.*INFO\\].*", Replacement: "", RemoveEmptyLines: true},
+				{Name: "Error", Regex: "(?m)^.*\\[.*ERROR\\].*", Replacement: "", RemoveEmptyLines: true},
+				{Name: "JsonMin", Regex: "\\s(?=[\\s\":{}])", Replacement: "", RemoveEmptyLines: true},
 				{Name: "JavaStackTrace", Regex: "(?m)^.*?Exception.*(?:[\\r|\\n]+^\\s*at .*)+"},
-				{Name: "JsonMin", Regex: "[\\s|\\r|\\n|\\r\\n]"},
+				{Name: "StackTrace", Regex: "(?m)((.*(\\n|\\r|\\r\\n)){1})^.*?Exception.*(?:[\\n|\\r|\\r\\n]+^\\s*at .*)+",
+					Replacement: "Nothing ever happened here :)", RemoveEmptyLines: true},
 			},
 		},
 	}
@@ -100,8 +102,10 @@ func ReadJson() {
 	}
 
 	for i := 0; i < len(JsonConfig.LogAnalyzer.Filters); i++ {
-		logger.Debug("Filter \"" + JsonConfig.LogAnalyzer.Filters[i].Name +
-			"\" loaded with Regex \"" + JsonConfig.LogAnalyzer.Filters[i].Regex + "\"",
+		logger.Debug("Filter \"" + JsonConfig.LogAnalyzer.Filters[i].Name + "\" loaded with Regex \"" +
+			JsonConfig.LogAnalyzer.Filters[i].Regex + "\",  Replacement \"" +
+			JsonConfig.LogAnalyzer.Filters[i].Replacement + "\" and RemoveEmptyLines \"" +
+			fmt.Sprintf("%t", JsonConfig.LogAnalyzer.Filters[i].RemoveEmptyLines) + "\"",
 		)
 	}
 }
