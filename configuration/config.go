@@ -50,6 +50,7 @@ func writeConfig() {
 				{Name: "Error", Regex: "(?m)^.*\\[.*ERROR\\].*"},
 				{Name: "StackTrace", Regex: "(?m)((.*(\\n|\\r|\\r\\n)){1})^.*?Exception.*(?:[\\n|\\r|\\r\\n]+^\\s*at .*)+"},
 				{Name: "JavaStackTrace", Regex: "(?m)^.*?Exception.*(?:[\\r|\\n]+^\\s*at .*)+"},
+				{Name: "JsonMin", Regex: "[\\s|\\r|\\n|\\r\\n]"},
 			},
 		},
 	}

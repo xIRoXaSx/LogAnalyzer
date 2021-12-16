@@ -66,4 +66,5 @@ func printHelp() {
 	fmt.Println("  LogAnalyzer [command]")
 	fmt.Println("")
 	commands.PrintCommands()
+	fmt.Println("")
 }
