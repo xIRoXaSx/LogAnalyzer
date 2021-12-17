@@ -17,6 +17,7 @@ type Filter struct {
 	Regex            string
 	Replacement      string
 	RemoveEmptyLines bool
+	DontPrintStats   bool
 }
 
 // Command is a struct for each available command with its Usage and Description

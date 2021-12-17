@@ -46,6 +46,11 @@ func Replace(filePath string, filter structs.Filter, replacement string) {
 	}
 
 	fmt.Println(replaced)
+
+	if filter.DontPrintStats {
+		return
+	}
+
 	fmt.Println()
 	logger.Info("Finished after " + helper.CalculateExecutionDuration(start))
 }
