@@ -13,19 +13,49 @@ import (
 
 // CheckArgs checks the os.Args for a passed Filter
 func CheckArgs() {
-	if len(os.Args) < 2 {
-		printHelp()
-		return
+	// If no arguments are provided use interactive mode
+	if len(os.Args) == 1 {
+		selectedCommand, err := commands.CompleteCommandPrompt()
+		if err == nil {
+			os.Args = append(os.Args, selectedCommand)
+		} else {
+			logger.Critical(err.Error())
+			return
+		}
+
+		if selectedCommand == "help" {
+			printHelp()
+			return
+		}
+
+		selectedFilter, err := commands.CompleteFilterPrompt(configuration.JsonConfig.LogAnalyzer.Filters)
+		if err == nil {
+			os.Args = append(os.Args, selectedFilter)
+		} else {
+			logger.Critical(err.Error())
+			return
+		}
+
+		selectedFile, err := commands.CompleteFilePrompt()
+		if err == nil {
+			os.Args = append(os.Args, selectedFile)
+		} else {
+			logger.Critical(err.Error())
+			return
+		}
 	}
 
+	helpRegex := regexp.MustCompile(`^h[elp]?`)
 	inspectRegex := regexp.MustCompile(`^i[nspect]?`)
 	listFilterRegex := regexp.MustCompile(`^f[ilters]?|^l[istfler]?`)
 	replaceFilterRegex := regexp.MustCompile(`^r[eplac]?`)
+	filter, filePath := getFilterAndFilePathFromArgs(os.Args[1:])
 
 	switch {
+	case len(os.Args) == 1 || helpRegex.MatchString(os.Args[1]):
+		printHelp()
+		return
 	case inspectRegex.MatchString(os.Args[1]):
-		filter, filePath := getFilterAndFilePathFromArgs(os.Args[1:])
-
 		logger.Info("Used filter \"" + filter.Name + "\"")
 		commands.Inspect(filePath, filter)
 		return
@@ -33,7 +63,6 @@ func CheckArgs() {
 		commands.ListFilter()
 		return
 	case replaceFilterRegex.MatchString(os.Args[1]):
-		filter, filePath := getFilterAndFilePathFromArgs(os.Args[1:])
 		replacement := filter.Replacement
 
 		if len(os.Args) >= 5 {
