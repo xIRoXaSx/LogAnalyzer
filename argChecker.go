@@ -16,33 +16,18 @@ func CheckArgs() {
 	// If no arguments are provided use interactive mode
 	if len(os.Args) == 1 {
 		selectedCommand, err := commands.CompleteCommandPrompt()
-		if err == nil {
-			os.Args = append(os.Args, selectedCommand)
-		} else {
-			logger.Critical(err.Error())
-			return
-		}
-
 		if selectedCommand == "help" {
 			printHelp()
 			return
 		}
 
+		appendToArgsIfErrorNil(selectedCommand, err)
+
 		selectedFilter, err := commands.CompleteFilterPrompt(configuration.JsonConfig.LogAnalyzer.Filters)
-		if err == nil {
-			os.Args = append(os.Args, selectedFilter)
-		} else {
-			logger.Critical(err.Error())
-			return
-		}
+		appendToArgsIfErrorNil(selectedFilter, err)
 
 		selectedFile, err := commands.CompleteFilePrompt()
-		if err == nil {
-			os.Args = append(os.Args, selectedFile)
-		} else {
-			logger.Critical(err.Error())
-			return
-		}
+		appendToArgsIfErrorNil(selectedFile, err)
 	}
 
 	helpRegex := regexp.MustCompile(`^h[elp]?`)
@@ -64,7 +49,6 @@ func CheckArgs() {
 		return
 	case replaceFilterRegex.MatchString(os.Args[1]):
 		replacement := filter.Replacement
-
 		if len(os.Args) >= 5 {
 			replacement = os.Args[4]
 		}
@@ -97,6 +81,15 @@ func getFilterAndFilePathFromArgs(args []string) (structs.Filter, string) {
 		}
 	}
 
+	if filePath == "" {
+		filePath, _ = commands.CompleteFilePrompt()
+	}
+
+	if filter == (structs.Filter{}) {
+		filterString, _ := commands.CompleteFilterPrompt(configuration.JsonConfig.LogAnalyzer.Filters)
+		filter = configuration.GetFilterFromName(filterString)
+	}
+
 	return filter, filePath
 }
 
@@ -108,4 +101,14 @@ func printHelp() {
 	fmt.Println("")
 	commands.PrintCommands()
 	fmt.Println("")
+}
+
+// appendToArgsIfErrorNil appends the given arg to the os.Args if err is nil, otherwise exits with code 1
+func appendToArgsIfErrorNil(arg string, err error) {
+	if err == nil {
+		os.Args = append(os.Args, arg)
+	} else {
+		logger.Critical(err.Error())
+		os.Exit(1)
+	}
 }

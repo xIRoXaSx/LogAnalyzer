@@ -109,3 +109,14 @@ func ReadJson() {
 		)
 	}
 }
+
+// GetFilterFromName gets a filter from its name or returns an empty structs.Filter struct if it did not match
+func GetFilterFromName(filterName string) structs.Filter {
+	for i := 0; i < len(JsonConfig.LogAnalyzer.Filters); i++ {
+		if strings.EqualFold(JsonConfig.LogAnalyzer.Filters[i].Name, filterName) {
+			return JsonConfig.LogAnalyzer.Filters[i]
+		}
+	}
+
+	return structs.Filter{}
+}

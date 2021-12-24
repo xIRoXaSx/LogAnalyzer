@@ -8,6 +8,7 @@ import (
 	survey "github.com/AlecAivazis/survey/v2"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 var Commands []structs.Command
@@ -118,7 +119,6 @@ func CompleteFilePrompt() (string, error) {
 // Directories of the returned slice will have a "/" appended to it
 func getFilesAndDirs(toComplete string) []string {
 	files, _ := filepath.Glob(toComplete + "*")
-
 	for i := 0; i < len(files); i++ {
 		file, err := os.Lstat(files[i])
 		if err != nil {
@@ -126,7 +126,8 @@ func getFilesAndDirs(toComplete string) []string {
 		}
 
 		if file.IsDir() {
-			files[i] = file.Name() + "/"
+			files[i] = toComplete[:strings.LastIndex(toComplete, string(os.PathSeparator))] +
+				string(os.PathSeparator) + file.Name() + string(os.PathSeparator)
 			continue
 		}
 	}
