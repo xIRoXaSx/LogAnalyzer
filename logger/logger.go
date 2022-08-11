@@ -12,12 +12,7 @@ import (
 const (
 	colorReset  = "\033[0m"
 	colorRed    = "\033[31m"
-	colorGreen  = "\033[32m"
 	colorYellow = "\033[33m"
-	colorBlue   = "\033[34m"
-	colorPurple = "\033[35m"
-	colorCyan   = "\033[36m"
-	colorGray   = "\033[37m"
 	logFormat   = "2006/01/02 15:04:05"
 )
 
@@ -25,6 +20,7 @@ var l *logger
 
 type logger struct {
 	debugEnabled bool
+	statsEnabled bool
 	debug        *log.Logger
 	info         *log.Logger
 	warn         *log.Logger
@@ -42,13 +38,9 @@ func (w *logWriter) Write(b []byte) (n int, err error) {
 }
 
 // New creates a new singleton logging instance.
-func New(debug bool) {
+func New(stats bool) {
 	l = &logger{
-		debugEnabled: debug,
-		debug: log.New(&logWriter{
-			Writer: os.Stdout,
-			format: logFormat,
-		}, fmt.Sprintf(" [%sdbg%s] ", colorGray, colorReset), 0),
+		statsEnabled: stats,
 		info: log.New(&logWriter{
 			Writer: os.Stdout,
 			format: logFormat,
@@ -64,22 +56,12 @@ func New(debug bool) {
 	}
 }
 
-func Debug(msg string) {
-	if !l.debugEnabled {
-		return
-	}
-	l.debug.Println(msg)
-}
-
-func Debugf(format string, v ...any) {
-	if !l.debugEnabled {
-		return
-	}
-	l.debug.Printf(format, v...)
-}
-
 func Info(msg string) {
 	l.info.Println(msg)
+}
+
+func Statsf(format string, v ...any) {
+	l.info.Printf(format, v...)
 }
 
 func Infof(format string, v ...any) {
