@@ -8,6 +8,8 @@ import (
 	"LogAnalyzer/config"
 )
 
+const commandReplace = "replace"
+
 type replace struct {
 	*command
 }
@@ -15,7 +17,7 @@ type replace struct {
 func init() {
 	r := replace{
 		New(
-			"replace",
+			commandReplace,
 			"LogAnalyzer replace -filter <Filter> -in <Filepath> [-out <Filepath>]",
 			"Replace all matched strings with the given replacement option",
 		),

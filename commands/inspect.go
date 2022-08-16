@@ -8,10 +8,12 @@ type inspect struct {
 	*command
 }
 
+const commandInspect = "inspect"
+
 func init() {
 	in := inspect{
 		command: New(
-			"inspect",
+			commandInspect,
 			"LogAnalyzer inspect -filter <Filter> -in <Filepath> [-out <Filepath>]",
 			"Inspect a logfile with the provided filter",
 		),

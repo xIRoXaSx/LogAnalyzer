@@ -8,6 +8,8 @@ import (
 	"LogAnalyzer/logger"
 )
 
+const commandHelp = "help"
+
 type help struct {
 	*command
 }
@@ -15,9 +17,9 @@ type help struct {
 func init() {
 	in := help{
 		command: New(
-			"help",
+			commandHelp,
 			"LogAnalyzer help",
-			"Show this help message",
+			"Show the help message",
 		),
 	}
 	in.Register(in.Execute)
@@ -55,6 +57,5 @@ func (h *help) Execute(string, string, *config.Filter) (err error) {
 			c.Description(),
 		)
 	}
-
 	return
 }

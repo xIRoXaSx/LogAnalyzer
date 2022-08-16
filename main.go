@@ -25,7 +25,8 @@ func main() {
 
 	args := os.Args
 	if len(args) == 1 {
-		logger.Fatal("no command supplied")
+		commands.Interactive()
+		os.Exit(0)
 	}
 
 	cmd := args[1]

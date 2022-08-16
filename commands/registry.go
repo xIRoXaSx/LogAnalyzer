@@ -1,10 +1,12 @@
 package commands
 
 import (
-	"os"
+	"errors"
 	"strings"
 	"sync"
 )
+
+var ErrNotExist = errors.New("command does not exist")
 
 type registry struct {
 	commands []*command
@@ -22,5 +24,5 @@ func Retrieve(r string) (c *command, err error) {
 		}
 		return c, nil
 	}
-	return nil, os.ErrNotExist
+	return nil, ErrNotExist
 }
