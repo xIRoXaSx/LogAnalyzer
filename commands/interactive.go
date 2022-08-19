@@ -64,8 +64,20 @@ func Interactive() {
 				logger.Error(err)
 				continue
 			}
-			in, out := askForFilePaths()
+
+			var (
+				in  string
+				out string
+			)
+			in, out, err = askForFilePaths()
+			if err != nil {
+				logger.Errorf("\n%v\n", err)
+				continue
+			}
 			err = cmd.Execute(in, out, &fs[ind])
+			if err != nil {
+				logger.Errorf("\n%v\n", err)
+			}
 		default:
 			err = cmd.Execute("", "", nil)
 			if err != nil {
@@ -85,7 +97,7 @@ func askForFilter(fs []config.Filter) (ind int, err error) {
 	return
 }
 
-func askForFilePaths() (in, out string) {
+func askForFilePaths() (in, out string, err error) {
 	ask := func(msgOpt string) (resp string, err error) {
 		err = sv.AskOne(&sv.Input{
 			Message: fmt.Sprintf("Chose the %s file: ", msgOpt),
@@ -93,15 +105,11 @@ func askForFilePaths() (in, out string) {
 		}, &resp)
 		return
 	}
-	in, err := ask("input")
+	in, err = ask("input")
 	if err != nil {
-		logger.Error(err)
 		return
 	}
 	out, err = ask("output")
-	if err != nil {
-		logger.Error(err)
-	}
 	return
 }
 
@@ -118,16 +126,12 @@ func getPath(p string) []string {
 
 		// Autocomplete directory names.
 		if f.IsDir() {
-			//split := strings.Split(p, string(os.PathSeparator))
-			//if len(split) > 1 {
-			//}
-			//paths[i] = p + f.Name()[len(p):] + string(os.PathSeparator)
 			lastInd := strings.LastIndex(p, string(os.PathSeparator))
 			if lastInd == -1 {
 				paths[i] = p + f.Name()[len(p):] + string(os.PathSeparator)
 				continue
 			}
-			paths[i] = filepath.Dir(p) + f.Name()[len(filepath.Base(p)):] + string(os.PathSeparator)
+			paths[i] += string(os.PathSeparator)
 		}
 	}
 	return paths
